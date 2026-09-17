@@ -28,7 +28,7 @@ jobs:
           swift --version
 
           SWIFT_VERSION="$(swift --version | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -1)"
-          if [[ ! "$SWIFT_VERSION" =~ ^6\.([2-9]|[1-9][0-9]) ]]; then
+          if [[ ! "$SWIFT_VERSION" =~ ^6\.([3-9]|[1-9][0-9]) ]]; then
             echo "::error::OpenVision's vendored packages require Swift 6.3 or newer; found $SWIFT_VERSION."
             exit 1
           fi
