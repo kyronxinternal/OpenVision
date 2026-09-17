@@ -1,0 +1,60 @@
+name: Build OpenVision
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Install Metal Toolchain
+        run: xcodebuild -downloadComponent MetalToolchain
+
+      - name: Create configuration files
+        run: |
+          cat > Config.xcconfig <<EOF
+          DEVELOPMENT_TEAM = ${{ secrets.DEVELOPMENT_TEAM }}
+          PRODUCT_BUNDLE_IDENTIFIER = com.${{ github.actor }}.openvision
+          META_APP_ID = ${{ secrets.META_APP_ID }}
+          CLIENT_TOKEN = ${{ secrets.CLIENT_TOKEN }}
+          APP_LINK_URL_SCHEME = openvision
+          EOF
+
+          cp OpenVision/Config/Config.swift.example OpenVision/Config/Config.swift
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project OpenVision.xcodeproj
+
+      - name: Build unsigned app
+        run: |
+          xcodebuild \
+            -project OpenVision.xcodeproj \
+            -scheme OpenVision \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/OpenVision.app Payload/
+          zip -qry OpenVision-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenVision-IPA
+          path: OpenVision-unsigned.ipa
