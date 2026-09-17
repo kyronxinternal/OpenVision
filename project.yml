@@ -4,8 +4,8 @@ options:
   # iOS 18 is required by the on-device Gemma 4 (MLX) backend.
   deploymentTarget:
     iOS: "18.0"
-  # The vendored Kokoro/Misaki packages require Swift tools 6.2 (Xcode 26).
-  xcodeVersion: "26.0"
+  # The vendored Kokoro/Misaki packages require Swift tools 6.3 (Xcode 26.6).
+  xcodeVersion: "26.6"
   generateEmptyDirectories: true
   groupSortPosition: top
 
@@ -13,7 +13,7 @@ settings:
   base:
     MARKETING_VERSION: "2.13.0"
     CURRENT_PROJECT_VERSION: "14"
-    # Keep app sources in Swift 5 language mode while Swift 6.2 builds package dependencies.
+    # Keep app sources in Swift 5 language mode while Swift 6.3 builds package dependencies.
     SWIFT_VERSION: "5.0"
     DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
     CODE_SIGN_STYLE: Automatic
